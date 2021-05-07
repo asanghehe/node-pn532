@@ -22,15 +22,9 @@ class PN532 extends EventEmitter {
         options = options || {};
         this.pollInterval = options.pollInterval || 1000;
 
-        if (hal.constructor.name === 'SerialPort') {
-            var PN532_UART = require('./pn532_uart');
-            this.hal = new PN532_UART(hal);
-        } else if (hal.constructor.name === 'i2c') {
-            var PN532_I2C = require('./pn532_i2c');
-            this.hal = new PN532_I2C(hal);
-        } else {
-            throw new Error('Unknown hardware type: ', hal.constructor.name);
-        }
+        var PN532_UART = require('./pn532_uart');
+        this.hal = new PN532_UART(hal);
+
 
         this.frameEmitter = new FrameEmitter(this.hal);
         this.hal.init().then(() => {
@@ -96,7 +90,8 @@ class PN532 extends EventEmitter {
 
         // TODO: Test IRQ triggered reads
 
-        var timeout = 0x00;  // 0x00-0xFF (12.75 seconds).  Only valid for Virtual card mode (SAMCONFIGURATION_MODE_VIRTUAL_CARD)
+        //var timeout = 0x00;  // 0x00-0xFF (12.75 seconds).  Only valid for Virtual card mode (SAMCONFIGURATION_MODE_VIRTUAL_CARD)
+        var timeout = 0x14;     //timeout 50ms * 20 = 1 second
 
         var commandBuffer = [
             c.COMMAND_SAMCONFIGURATION,
@@ -272,7 +267,7 @@ class PN532 extends EventEmitter {
         var commandBuffer = [].concat([
             c.COMMAND_IN_DATA_EXCHANGE,
             tagNumber,
-            c.MIFARE_COMMAND_WRITE_4,
+            c.MIFARE_COMMAND_WRITE_16,
             blockAddress
         ],  block);
 
@@ -304,7 +299,7 @@ class PN532 extends EventEmitter {
             c.TAG_MEM_TERMINATOR_TLV
         ]);
 
-        logger.debug('block:', util.inspect(new Buffer(block)));
+        logger.debug('block:', util.inspect(Buffer.from(block)));
 
         var PAGE_SIZE = 4;
         var totalBlocks = Math.ceil(block.length / PAGE_SIZE);
@@ -321,7 +316,7 @@ class PN532 extends EventEmitter {
                 }
 
                 logger.debug('Writing block:', blockNum, 'at blockAddress:', blockAddress);
-                logger.debug('pageData:', util.inspect(new Buffer(pageData)));
+                logger.debug('pageData:', util.inspect(Buffer.from(pageData)));
                 return self.writeBlock(pageData, {blockAddress: blockAddress})
                 .then(function(block) {
                     blockNum++;

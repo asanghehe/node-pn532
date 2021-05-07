@@ -3,13 +3,6 @@
   PN532 User Manual
 */
 
-// Typical PN532 address
-exports.I2C_ADDRESS = 0x48 >> 1; // 7-bit address bit shifted to 8-bit (?)
-// exports.I2C_READBIT = 0x01;
-// exports.I2C_BUSY = 0x00;
-// exports.I2C_READY = 0x01;
-// exports.I2C_READYTIMEOUT = 20;
-
 // Section 7 - Commands supported (page 65)
 // Miscellaneous
 exports.COMMAND_DIAGNOSE               = 0x00;

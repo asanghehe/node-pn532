@@ -1,7 +1,7 @@
 var pn532 = require('../src/pn532');
 var SerialPort = require('serialport');
 
-var serialPort = new SerialPort('/dev/tty.usbserial-AFWR836M', { baudRate: 115200 });
+var serialPort = new SerialPort('COM2', { baudRate: 115200 });
 var rfid = new pn532.PN532(serialPort, { pollInterval: 3000 });
 var ndef = require('ndef');
 
@@ -13,13 +13,15 @@ rfid.on('ready', function() {
         console.log('Tag', tag);
 
         console.log('Authenticating...');
-        rfid.authenticateBlock(tag.uid).then(function() {
+        rfid.authenticateBlock(tag.uid, {blockAddress: 0x08}).then(function() {
             console.log('Reading tag data...');
-            rfid.readData().then(function(data) {
+            rfid.readBlock({
+                blockAddress: 0x08
+            }).then(function(data) {
                 console.log('Tag data:', data);
 
-                var records = ndef.decodeMessage(data.toJSON());
-                console.log(records);
+                //var records = ndef.decodeMessage(data.toJSON());
+                //console.log(records);
             });
         });
     });

@@ -7,6 +7,8 @@ var PREAMBLE     = 0x00;
 var START_CODE_1 = 0x00;
 var START_CODE_2 = 0xFF;
 var POSTAMBLE    = 0x00;
+var HOSTTOPN532  = 0xD4;
+var PN532TOHOST  = 0xD5;
 
 /*
     Represents a single communication frame for communication with the PN532 NFC Chip.
@@ -69,7 +71,7 @@ class DataFrame extends Frame {
             var dataLength = buffer[3];
             var dataStart = 6;
             var dataEnd = dataStart + dataLength;
-            var d = new Buffer(dataLength);
+            var d = Buffer.alloc(dataLength);
             buffer.copy(d, 0, dataStart, dataEnd);
 
             this._data = d;
@@ -180,7 +182,7 @@ class DataFrame extends Frame {
             this.getDataChecksum(),
             POSTAMBLE
         ]);
-        return new Buffer(array);
+        return Buffer.from(array);
     }
 }
 
@@ -205,7 +207,7 @@ class AckFrame extends Frame {
     }
 
     toBuffer() {
-        return new Buffer([
+        return Buffer.from([
             PREAMBLE,
             START_CODE_1,
             START_CODE_2,
@@ -242,7 +244,7 @@ class NackFrame extends Frame {
     }
 
     toBuffer() {
-        return new Buffer([
+        return Buffer.from([
             PREAMBLE,
             START_CODE_1,
             START_CODE_2,
@@ -276,7 +278,7 @@ class ErrorFrame extends DataFrame {
     }
 
     toBuffer() {
-        return new Buffer([
+        return Buffer.from([
             PREAMBLE,
             START_CODE_1,
             START_CODE_2,

@@ -43,12 +43,4 @@ module.exports = function setupLogging(level) {
           label: 'hsu'
         }
     });
-
-    winston.loggers.add('i2c', {
-        console: {
-          level: level,
-          colorize: 'true',
-          label: 'hsu'
-        }
-    });
 }
