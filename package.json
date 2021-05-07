@@ -10,7 +10,7 @@
   "dependencies": {
     "ndef": "^0.2.0",
     "serialport": "^9.0.7",
-    "winston": "^0.8.0"
+    "winston": "^3.3.3"
   },
   "engine": {
     "node": ">=8.0.0"
