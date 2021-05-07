@@ -5,6 +5,8 @@
 需要修改每个块的写入长度的话，修改src/pn532.js 里面的writeBlock 方法的 c.MIFARE_COMMAND_WRITE_16 为 c.MIFARE_COMMAND_WRITE_4
 因为用不到ndef数据格式，这部分没有修改
 
+依赖版本均已升级到当前最新
+
 Driver for the PN532 NFC chip.  Provides an event and promise-based API, and requires either:
 - [node-serialport](https://github.com/voodootikigod/node-serialport)
 - [node-i2c](https://github.com/kelly/node-i2c) (WIP)(已经去掉对I2C的支持)
