@@ -1,8 +1,13 @@
 # PN532
 
+读写测试通过，使用的淘宝买的PN532模块一级 MifraClassic 1k 白卡。
+原项目example 写卡是4byte 4byte的一个块写入，本项目改成16byte 16byte的写入，原项目没有说明使测试一直没成功
+需要修改每个块的写入长度的话，修改src/pn532.js 里面的writeBlock 方法的 c.MIFARE_COMMAND_WRITE_16 为 c.MIFARE_COMMAND_WRITE_4
+因为用不到ndef数据格式，这部分没有修改
+
 Driver for the PN532 NFC chip.  Provides an event and promise-based API, and requires either:
 - [node-serialport](https://github.com/voodootikigod/node-serialport)
-- [node-i2c](https://github.com/kelly/node-i2c) (WIP)
+- [node-i2c](https://github.com/kelly/node-i2c) (WIP)(已经去掉对I2C的支持)
 
 This implementation does not require libnfc, and should work on both X86 (32-bit or 64-bit) and ARM (RPi / Beaglebone) systems
 
@@ -14,7 +19,7 @@ API is subject to change until the 1.0.0 release
 ### Install
     npm install pn532
 
-and `npm install serialport` or `npm install i2c`
+and `npm install serialport`
 
 ### Example
 
@@ -27,14 +32,6 @@ var serialPort = new SerialPort('/dev/tty.usbserial-AFWR836M', { baudRate: 11520
 var rfid = new pn532.PN532(serialPort);
 ```
 
-#### I2C (using [node-i2c](https://github.com/kelly/node-i2c))
-```js
-var pn532 = require('pn532');
-var i2c = require('i2c');
-
-var wire = new i2c(pn532.I2C_ADDRESS, {device: '/dev/i2c-1'});
-var rfid = new pn532.PN532(wire);
-```
 
 #### Scan a tag
 ```js
@@ -60,6 +57,27 @@ rfid.on('ready', function() {
 rfid.on('ready', function() {
     rfid.getFirmwareVersion().then(function(data) {
         console.log('firmware: ', data);
+    });
+});
+```
+
+#### 写卡，按byte写入。 windows环境下面  用COMx 的形式连设备
+```js
+rfid.on('ready', function() {
+
+    console.log('Listening for a tag scan...');
+    rfid.on('tag', function(tag) {
+        console.log('Tag', tag);
+
+        console.log('Authenticating...');
+        rfid.authenticateBlock(tag.uid, {blockAddress: 0x08}).then(function() {
+
+            console.log('writing tag data...');
+
+            rfid.writeBlock([1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], {blockAddress:0x08}).then(function() {
+                console.log('Write success...');
+            });
+        });
     });
 });
 ```
